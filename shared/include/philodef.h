@@ -6,14 +6,13 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 16:58:53 by gbohm             #+#    #+#             */
-/*   Updated: 2023/06/14 10:14:27 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/06/14 10:41:05 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILO_DEF_H
-# define PHILO_DEF_H
+#ifndef PHILODEF_H
+# define PHILODEF_H
 
-# include <stddef.h>
 # include <pthread.h>
 
 typedef struct s_data t_data;

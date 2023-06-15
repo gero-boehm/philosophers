@@ -1,8 +1,8 @@
 CC=cc
 CFLAGS=-I shared/include -I philo -I philo_bonus
 NAME=philo
-SHARED=shared/mutex/init.c shared/mutex/lock.c shared/mutex/destroy.c
-SRC=philo/philo.c
+SHARED=shared/mutex/init.c shared/mutex/lock.c shared/mutex/destroy.c shared/parse.c
+SRC=$(SHARED) philo/philo.c philo/fork.c
 BONUS_SRC=
 OBJ=$(SRC:.c=.o)
 BONUS_OBJ=$(BONUS_SRC:.c=.o)
@@ -25,13 +25,13 @@ $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) -o philo/$(NAME) $^
 
 bonus: $(BONUS_OBJ)
-	$(CC) $(CFLAGS) -o philo_bonus $^
+	$(CC) $(CFLAGS) -o philo_bonus/philo_bonus $^
 
 clean:
 	rm -f $(OBJ) $(BONUS_OBJ)
 
 fclean: clean
-	rm -f philo/$(NAME) philo_bonus
+	rm -f philo/$(NAME) philo_bonus/philo_bonus
 
 re: fclean all
 

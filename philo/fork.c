@@ -6,11 +6,11 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 10:18:43 by gbohm             #+#    #+#             */
-/*   Updated: 2023/06/14 10:20:04 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/06/14 10:41:55 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philo.c"
+#include "philo.h"
 
 static void	pick_up_fork(t_philo *philo)
 {

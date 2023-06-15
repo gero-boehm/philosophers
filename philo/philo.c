@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 17:00:46 by gbohm             #+#    #+#             */
-/*   Updated: 2023/06/14 10:26:10 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/06/14 10:51:50 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,41 +37,6 @@ int	malloc2(size_t size, void **ptr)
 	return (*ptr == NULL);
 }
 
-size_t	_strlen(char *str)
-{
-	size_t	len;
-
-	len = 0;
-	while (str[len])
-		len++;
-	return (len);
-}
-
-int	is_digit(char c)
-{
-	return (c >= '0' && c <= '9');
-}
-
-int	_atoui(char *str, unsigned int *result)
-{
-	long	tmp;
-
-	if (_strlen(str) > 10)
-		return (1);
-	tmp = 0;
-	while(*str)
-	{
-		if (!is_digit(*str))
-			return (2);
-		tmp = tmp * 10 + *str - '0';
-		str++;
-	}
-	if(tmp > INT_MAX)
-		return (3);
-	*result = tmp;
-	return (0);
-}
-
 unsigned long	get_time(void)
 {
 	struct timeval	now;
@@ -82,17 +47,17 @@ unsigned long	get_time(void)
 
 int	parse(char **argv, t_data *data)
 {
-	if (_atoui(argv[1], &data->num_philos))
+	if (parse_num(argv[1], &data->num_philos))
 		return (1);
-	if (_atoui(argv[2], &data->time_to_die))
+	if (parse_num(argv[2], &data->time_to_die))
 		return (2);
-	if (_atoui(argv[3], &data->time_to_eat))
+	if (parse_num(argv[3], &data->time_to_eat))
 		return (3);
-	if (_atoui(argv[4], &data->time_to_sleep))
+	if (parse_num(argv[4], &data->time_to_sleep))
 		return (4);
 	if (argv[5] == NULL)
 		data->num_eat = 0;
-	else if (_atoui(argv[5], &data->num_eat))
+	else if (parse_num(argv[5], &data->num_eat))
 		return (5);
 	data->should_terminate = 0;
 	return (0);
@@ -183,11 +148,15 @@ void	announce_activity(t_philo *philo)
 {
 	char	*str;
 
+	str = "";
 	if (is_philo_eating(philo))
+	{
 		str = "eating";
-	if (is_philo_sleeping(philo))
+		printf("%lu %u has taken a fork\n", philo->activity_start, philo->id);
+	}
+	else if (is_philo_sleeping(philo))
 		str = "sleeping";
-	if (is_philo_thinking(philo))
+	else if (is_philo_thinking(philo))
 		str = "thinking";
 	printf("%lu %u is %s\n", philo->activity_start, philo->id, str);
 }
@@ -222,8 +191,6 @@ int	should_terminate(t_philo *philo)
 	mutex_unlock(&philo->data->lock_should_terminate);
 	return (should_terminate);
 }
-
-
 
 void	switch_activity(t_philo *philo, t_activity activity)
 {
@@ -295,6 +262,7 @@ int	is_philo_satiated(t_philo *philo)
 int	can_philo_eat(t_philo *philo)
 {
 	int	picked_up_forks;
+
 	if (is_philo_eating(philo) || is_philo_sleeping(philo))
 		return (0);
 	picked_up_forks = 0;
