@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 17:00:46 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/12 13:45:33 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/12 16:14:08 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,8 @@ unsigned long	get_time(void)
 	return (now.tv_sec * 1000 + now.tv_usec / 1000);
 }
 
-int	parse(char **argv, t_data *data)
+int	parse(char **argv,
+			t_data *data)
 {
 	if (parse_num(argv[1], &data->num_philos))
 		return (1);
@@ -62,38 +63,6 @@ int	parse(char **argv, t_data *data)
 	data->num_philos_hungry = data->num_philos;
 	data->should_terminate = 0;
 	return (0);
-}
-
-t_philo	*get_left_philo(t_data *data, unsigned int index)
-{
-	index = (index - 1 + data->num_philos) % data->num_philos;
-	return (&data->philos[index]);
-}
-
-int	create_philo_array(t_data *data)
-{
-	return (malloc2(data->num_philos, (void **) &data->philos));
-}
-
-void	spawn_philos(t_data *data)
-{
-	unsigned int	i;
-	unsigned long	time;
-	t_philo			*philo;
-
-	i = 0;
-	time = get_time();
-	while (i < data->num_philos)
-	{
-		philo = &data->philos[i];
-		philo->id = i + 1;
-		philo->last_eaten = time;
-		philo->activity = THINKING;
-		philo->fork.in_use = 0;
-		philo->left_philo = get_left_philo(data, i);
-		philo->data = data;
-		i++;
-	}
 }
 
 unsigned long	get_time_since_last_eaten(t_philo *philo)
@@ -212,7 +181,7 @@ int	is_philo_satiated(t_philo *philo)
 	return (is_satiated);
 }
 
-void	finish_eating(t_philo *philo, unsigned long time)
+void	finish_eating(t_philo *philo)
 {
 	put_down_forks(philo);
 	philo->num_eaten++;
@@ -230,7 +199,7 @@ void	switch_activity(t_philo *philo, t_activity activity)
 
 	time = get_time();
 	if (is_philo_eating(philo))
-		finish_eating(philo, time);
+		finish_eating(philo);
 	philo->activity = activity;
 	philo->activity_start = time;
 	if (is_philo_eating(philo))
@@ -305,44 +274,6 @@ void execute_activity(t_philo *philo)
 		switch_activity(philo, EATING);
 }
 
-void	*thread_callback(void *arg)
-{
-	t_philo			*philo;
-
-	philo = arg;
-	while (1)
-	{
-		if (should_philo_die(philo))
-			die(philo);
-		if (should_terminate(philo))
-			return (NULL);
-		execute_activity(philo);
-		usleep(1000);
-	}
-	return (NULL);
-}
-
-int	spawn_threads(t_data *data)
-{
-	unsigned int	i;
-	t_philo			*philo;
-
-	i = 0;
-	while (i < data->num_philos)
-	{
-		philo = &data->philos[i];
-		if (pthread_create(&philo->thread, NULL, thread_callback, philo))
-		{
-			mutex_lock(&data->lock_should_terminate);
-			data->should_terminate = 1;
-			mutex_unlock(&data->lock_should_terminate);
-			return (1);
-		}
-		i++;
-	}
-	return (0);
-}
-
 void	wait_for_threads(t_data *data)
 {
 	unsigned int	i;
@@ -370,25 +301,8 @@ int main(int argc, char **argv) {
 		return (printf("Incorrect argument count.\n"), 1);
 	if (parse(argv, &data))
 		return (printf("An argument is incorrectly formatted.\n"), 2);
-	if (create_philo_array(&data))
-	{
-		printf("Error creating philo array.\n");
-		return (4);
-	}
-	spawn_philos(&data);
-	if (init_mutexes(&data))
-	{
-		destroy_mutexes(&data);
-		free(data.philos);
-		printf("Error initializing mutexes.\n");
-		return (5);
-	}
-	if (spawn_threads(&data))
-	{
-		cleanup(&data);
-		printf("Error spawning threads.\n");
-		return (6);
-	}
+	if (setup(&data))
+		return (3);
 	cleanup(&data);
 	return (0);
 }

@@ -1,26 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   philo_shared.h                                     :+:      :+:    :+:   */
+/*   callback.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/06/08 16:58:53 by gbohm             #+#    #+#             */
-/*   Updated: 2023/06/14 10:33:20 by gbohm            ###   ########.fr       */
+/*   Created: 2023/08/12 14:47:18 by gbohm             #+#    #+#             */
+/*   Updated: 2023/08/12 17:25:49 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILO_SHARED_H
-# define PHILO_SHARED_H
+#include <unistd.h>
+#include "philo.h"
 
-# include "philodef.h"
+void	*thread_callback(void *arg)
+{
+	t_philo			*philo;
 
-int		init_mutexes(t_data *data);
-void	destroy_mutexes(t_data *data);
-void	mutex_lock(t_mutex *mutex);
-void	mutex_unlock(t_mutex *mutex);
-
-int		parse_num(char *str, unsigned int *result);
-
-
-#endif
+	philo = arg;
+	while (1)
+	{
+		if (should_philo_die(philo))
+			die(philo);
+		if (should_terminate(philo))
+			return (NULL);
+		execute_activity(philo);
+		usleep(1000);
+	}
+	return (NULL);
+}

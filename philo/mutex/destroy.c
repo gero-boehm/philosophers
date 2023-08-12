@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 10:10:49 by gbohm             #+#    #+#             */
-/*   Updated: 2023/07/20 21:31:55 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/12 14:36:31 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ void	destroy_mutexes(t_data *data)
 	destroy_mutex(&data->lock_time_to_sleep);
 	destroy_mutex(&data->lock_num_eat);
 	destroy_mutex(&data->lock_num_philos_hungry);
+	destroy_mutex(&data->lock_simulation_start);
 	destroy_mutex(&data->lock_should_terminate);
 	destroy_philo_mutexes(data);
 }

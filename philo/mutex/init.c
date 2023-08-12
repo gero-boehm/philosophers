@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 10:12:25 by gbohm             #+#    #+#             */
-/*   Updated: 2023/07/20 21:31:55 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/12 14:35:46 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,11 @@ int	init_mutexes(t_data *data)
 		return (4);
 	if (init_mutex(&data->lock_num_philos_hungry))
 		return (5);
-	if (init_mutex(&data->lock_should_terminate))
+	if (init_mutex(&data->lock_simulation_start))
 		return (6);
-	if (init_philo_mutexes(data))
+	if (init_mutex(&data->lock_should_terminate))
 		return (7);
+	if (init_philo_mutexes(data))
+		return (8);
 	return (0);
 }
