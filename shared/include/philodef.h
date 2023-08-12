@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 16:58:53 by gbohm             #+#    #+#             */
-/*   Updated: 2023/06/14 10:41:05 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/07/20 21:31:55 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,13 @@ struct s_data {
 	unsigned int	time_to_eat;
 	unsigned int	time_to_sleep;
 	unsigned int	num_eat;
+	unsigned int	num_philos_hungry;
 	int				should_terminate;
 	t_mutex			lock_time_to_die;
 	t_mutex			lock_time_to_eat;
 	t_mutex			lock_time_to_sleep;
 	t_mutex			lock_num_eat;
+	t_mutex			lock_num_philos_hungry;
 	t_mutex			lock_should_terminate;
 	t_philo			*philos;
 };

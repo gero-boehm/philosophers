@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 17:00:46 by gbohm             #+#    #+#             */
-/*   Updated: 2023/06/14 10:51:50 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/12 13:45:33 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ int	parse(char **argv, t_data *data)
 		data->num_eat = 0;
 	else if (parse_num(argv[5], &data->num_eat))
 		return (5);
+	data->num_philos_hungry = data->num_philos;
 	data->should_terminate = 0;
 	return (0);
 }
@@ -177,19 +178,50 @@ void	terminate(t_philo *philo)
 		mutex_unlock(&philo->data->lock_should_terminate);
 		return;
 	}
-	// printf(ORANGE "terminate\n" RESET);
 	philo->data->should_terminate = 1;
 	mutex_unlock(&philo->data->lock_should_terminate);
+}
+
+void	die(t_philo *philo)
+{
+	terminate(philo);
 	announce_death(philo);
 }
 
 int	should_terminate(t_philo *philo)
 {
 	int	should_terminate;
+
 	mutex_lock(&philo->data->lock_should_terminate);
 	should_terminate = philo->data->should_terminate;
 	mutex_unlock(&philo->data->lock_should_terminate);
 	return (should_terminate);
+}
+
+int	is_philo_satiated(t_philo *philo)
+{
+	int	is_satiated;
+
+	mutex_lock(&philo->data->lock_num_eat);
+	// printf("%d\n", philo->num_eaten);
+	if (philo->data->num_eat == 0)
+		is_satiated = 0;
+	else
+		is_satiated = philo->num_eaten == philo->data->num_eat;
+	mutex_unlock(&philo->data->lock_num_eat);
+	return (is_satiated);
+}
+
+void	finish_eating(t_philo *philo, unsigned long time)
+{
+	put_down_forks(philo);
+	philo->num_eaten++;
+	mutex_lock(&philo->data->lock_num_philos_hungry);
+	if (is_philo_satiated(philo))
+		philo->data->num_philos_hungry--;
+	if (philo->data->num_philos_hungry == 0)
+		terminate(philo);
+	mutex_unlock(&philo->data->lock_num_philos_hungry);
 }
 
 void	switch_activity(t_philo *philo, t_activity activity)
@@ -198,13 +230,11 @@ void	switch_activity(t_philo *philo, t_activity activity)
 
 	time = get_time();
 	if (is_philo_eating(philo))
-	{
-		put_down_forks(philo);
-		philo->num_eaten++;
-		philo->last_eaten = time;
-	}
+		finish_eating(philo, time);
 	philo->activity = activity;
 	philo->activity_start = time;
+	if (is_philo_eating(philo))
+		philo->last_eaten = time;
 	announce_activity(philo);
 }
 
@@ -246,19 +276,6 @@ int	are_forks_available(t_philo *philo)
 	return (is_fork_available(philo) && is_fork_available(philo->left_philo));
 }
 
-int	is_philo_satiated(t_philo *philo)
-{
-	int	is_satiated;
-
-	mutex_lock(&philo->data->lock_num_eat);
-	if (philo->data->num_eat == 0)
-		is_satiated = 0;
-	else
-		is_satiated = philo->num_eaten == philo->data->num_eat;
-	mutex_unlock(&philo->data->lock_num_eat);
-	return (is_satiated);
-}
-
 int	can_philo_eat(t_philo *philo)
 {
 	int	picked_up_forks;
@@ -268,7 +285,7 @@ int	can_philo_eat(t_philo *philo)
 	picked_up_forks = 0;
 	mutex_lock(&philo->fork.lock);
 	mutex_lock(&philo->left_philo->fork.lock);
-	if (!is_philo_satiated(philo) && are_forks_available(philo))
+	if (are_forks_available(philo))
 	{
 		pick_up_forks(philo);
 		picked_up_forks = 1;
@@ -286,7 +303,6 @@ void execute_activity(t_philo *philo)
 		switch_activity(philo, THINKING);
 	if(can_philo_eat(philo))
 		switch_activity(philo, EATING);
-	usleep(1000);
 }
 
 void	*thread_callback(void *arg)
@@ -297,10 +313,11 @@ void	*thread_callback(void *arg)
 	while (1)
 	{
 		if (should_philo_die(philo))
-			terminate(philo);
+			die(philo);
 		if (should_terminate(philo))
 			return (NULL);
 		execute_activity(philo);
+		usleep(1000);
 	}
 	return (NULL);
 }
