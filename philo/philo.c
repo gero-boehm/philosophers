@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 17:00:46 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/12 16:14:08 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/16 16:11:16 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,39 @@ unsigned long	get_time(void)
 	return (now.tv_sec * 1000 + now.tv_usec / 1000);
 }
 
-int	parse(char **argv,
-			t_data *data)
+static char	*get_message_for_action(t_action action)
+{
+	if (action == TOOK_FORK)
+		return "has taken a fork";
+	else if (action == STARTED_EATING)
+		return "is eating";
+	else if (action == STARTED_SLEEPING)
+		return "is sleeping";
+	else if (action == STARTED_THINKING)
+		return "is thinking";
+	else if (action == DIED)
+		return "\033[31mdied";
+	return "";
+}
+
+void	announce(t_philo *philo, t_action action)
+{
+	unsigned long	time;
+	char			*message;
+
+	mutex_lock(&philo->data->lock_simulation_start);
+	mutex_lock(&philo->data->lock_should_terminate);
+	time = get_time() - philo->data->simulation_start;
+	message = get_message_for_action(action);
+	if (philo->data->should_terminate != 2)
+		printf("%lu %u %s\n", time, philo->id, message);
+	if (philo->data->should_terminate)
+		philo->data->should_terminate = 2;
+	mutex_unlock(&philo->data->lock_should_terminate);
+	mutex_unlock(&philo->data->lock_simulation_start);
+}
+
+int	parse(char **argv, t_data *data)
 {
 	if (parse_num(argv[1], &data->num_philos))
 		return (1);
@@ -61,6 +92,7 @@ int	parse(char **argv,
 	else if (parse_num(argv[5], &data->num_eat))
 		return (5);
 	data->num_philos_hungry = data->num_philos;
+	data->simulation_start = get_time();
 	data->should_terminate = 0;
 	return (0);
 }
@@ -116,45 +148,31 @@ int	should_philo_die(t_philo *philo)
 
 void	announce_activity(t_philo *philo)
 {
-	char	*str;
-
-	str = "";
 	if (is_philo_eating(philo))
-	{
-		str = "eating";
-		printf("%lu %u has taken a fork\n", philo->activity_start, philo->id);
-	}
+		announce(philo, STARTED_EATING);
 	else if (is_philo_sleeping(philo))
-		str = "sleeping";
+		announce(philo, STARTED_SLEEPING);
 	else if (is_philo_thinking(philo))
-		str = "thinking";
-	printf("%lu %u is %s\n", philo->activity_start, philo->id, str);
+		announce(philo, STARTED_THINKING);
 }
 
-void announce_death(t_philo *philo)
-{
-	unsigned long	time;
-
-	time = get_time();
-	printf("%lu %u died\n", time, philo->id);
-}
-
-void	terminate(t_philo *philo)
+int	terminate(t_philo *philo)
 {
 	mutex_lock(&philo->data->lock_should_terminate);
 	if (philo->data->should_terminate)
 	{
 		mutex_unlock(&philo->data->lock_should_terminate);
-		return;
+		return (0);
 	}
 	philo->data->should_terminate = 1;
 	mutex_unlock(&philo->data->lock_should_terminate);
+	return (1);
 }
 
 void	die(t_philo *philo)
 {
-	terminate(philo);
-	announce_death(philo);
+	if (terminate(philo))
+		announce(philo, DIED);
 }
 
 int	should_terminate(t_philo *philo)
@@ -207,7 +225,7 @@ void	switch_activity(t_philo *philo, t_activity activity)
 	announce_activity(philo);
 }
 
-int is_philo_done_eating(t_philo *philo)
+int	is_philo_done_eating(t_philo *philo)
 {
 	unsigned long	time;
 	int				is_done;
@@ -221,7 +239,7 @@ int is_philo_done_eating(t_philo *philo)
 	return (is_done);
 }
 
-int is_philo_done_sleeping(t_philo *philo)
+int	is_philo_done_sleeping(t_philo *philo)
 {
 	unsigned long	time;
 	int				is_done;
@@ -235,33 +253,14 @@ int is_philo_done_sleeping(t_philo *philo)
 	return (is_done);
 }
 
-int	is_fork_available(t_philo *philo)
-{
-	return (!philo->fork.in_use);
-}
-
-int	are_forks_available(t_philo *philo)
-{
-	return (is_fork_available(philo) && is_fork_available(philo->left_philo));
-}
-
 int	can_philo_eat(t_philo *philo)
 {
 	int	picked_up_forks;
 
 	if (is_philo_eating(philo) || is_philo_sleeping(philo))
 		return (0);
-	picked_up_forks = 0;
-	mutex_lock(&philo->fork.lock);
-	mutex_lock(&philo->left_philo->fork.lock);
-	if (are_forks_available(philo))
-	{
-		pick_up_forks(philo);
-		picked_up_forks = 1;
-	}
-	mutex_unlock(&philo->fork.lock);
-	mutex_unlock(&philo->left_philo->fork.lock);
-	return (picked_up_forks);
+	picked_up_forks = try_to_grab_forks(philo);
+	return (picked_up_forks == 2);
 }
 
 void execute_activity(t_philo *philo)

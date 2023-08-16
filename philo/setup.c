@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 14:40:01 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/12 17:25:21 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/16 15:57:15 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,36 @@ static t_philo	*get_left_philo(t_data *data, unsigned int index)
 	return (&data->philos[index]);
 }
 
+void	reserve_fork(t_philo *philo, t_fork *fork)
+{
+	if (fork->reserved_for != 0)
+		return ;
+	fork->reserved_for = philo->id;
+}
+
+void	reserve_forks(t_philo *philo)
+{
+	if (philo->id % 2 == 0)
+		return ;
+	reserve_fork(philo, &philo->fork);
+	reserve_fork(philo, &philo->left_philo->fork);
+}
+
+void	print_forks(t_data *data)
+{
+	unsigned int	i;
+	t_philo			*philo;
+
+	i = 0;
+	while (i < data->num_philos)
+	{
+		philo = &data->philos[i];
+		printf("(%u) %u|%u ", philo->id, philo->fork.belongs_to, philo->fork.reserved_for);
+		i++;
+	}
+	printf("\n");
+}
+
 static void	spawn_philos(t_data *data)
 {
 	unsigned int	i;
@@ -39,11 +69,22 @@ static void	spawn_philos(t_data *data)
 		philo->id = i + 1;
 		philo->last_eaten = time;
 		philo->activity = THINKING;
-		philo->fork.in_use = 0;
+		philo->fork.belongs_to = 0;
+		philo->fork.reserved_for = 0;
 		philo->left_philo = get_left_philo(data, i);
 		philo->data = data;
 		i++;
 	}
+	i = 0;
+	while (i < data->num_philos)
+	{
+		philo = &data->philos[i];
+		reserve_forks(philo);
+		// printf("%u - l %u|%u r %u|%u\n", philo->id, philo->left_philo->id, philo->left_philo->fork.reserved_for, philo->id, philo->fork.reserved_for);
+		i++;
+	}
+	print_forks(data);
+	// exit(0);
 }
 
 static int	spawn_threads(t_data *data)
