@@ -6,15 +6,16 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 10:18:43 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/12 17:28:42 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/17 12:49:40 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-static void	pick_up_fork(t_philo *philo)
+void	pick_up_fork(t_philo *philo)
 {
 	philo->fork.in_use = 1;
+	announce(philo, TOOK_FORK);
 }
 
 static void	put_down_fork(t_philo *philo)

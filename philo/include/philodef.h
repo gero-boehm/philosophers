@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 16:58:53 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/12 17:28:47 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/17 12:47:44 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,14 @@ typedef enum e_activity {
 	SLEEPING,
 	THINKING
 }	t_activity;
+
+typedef enum e_action {
+	TOOK_FORK,
+	STARTED_EATING,
+	STARTED_SLEEPING,
+	STARTED_THINKING,
+	DIED
+}	t_action;
 
 typedef struct s_mutex {
 	pthread_mutex_t	mutex;
@@ -55,14 +63,17 @@ struct s_data {
 	unsigned int	time_to_sleep;
 	unsigned int	num_eat;
 	unsigned int	num_philos_hungry;
-	unsigned int	simulation_start;
+	unsigned long	simulation_start;
+	unsigned int	simulation_ended;
 	int				should_terminate;
+	t_mutex			lock_num_philos;
 	t_mutex			lock_time_to_die;
 	t_mutex			lock_time_to_eat;
 	t_mutex			lock_time_to_sleep;
 	t_mutex			lock_num_eat;
 	t_mutex			lock_num_philos_hungry;
 	t_mutex			lock_simulation_start;
+	t_mutex			lock_simulation_ended;
 	t_mutex			lock_should_terminate;
 	t_philo			*philos;
 };

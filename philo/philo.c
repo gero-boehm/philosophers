@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 17:00:46 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/12 16:14:08 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/17 12:53:04 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,8 @@ int	parse(char **argv,
 	else if (parse_num(argv[5], &data->num_eat))
 		return (5);
 	data->num_philos_hungry = data->num_philos;
+	data->simulation_start = get_time();
+	data->simulation_ended = 0;
 	data->should_terminate = 0;
 	return (0);
 }
@@ -114,29 +116,52 @@ int	should_philo_die(t_philo *philo)
 	return (should_die);
 }
 
-void	announce_activity(t_philo *philo)
+static char	*get_message_for_action(t_action action)
 {
-	char	*str;
-
-	str = "";
-	if (is_philo_eating(philo))
-	{
-		str = "eating";
-		printf("%lu %u has taken a fork\n", philo->activity_start, philo->id);
-	}
-	else if (is_philo_sleeping(philo))
-		str = "sleeping";
-	else if (is_philo_thinking(philo))
-		str = "thinking";
-	printf("%lu %u is %s\n", philo->activity_start, philo->id, str);
+	if (action == TOOK_FORK)
+		return "has taken a fork";
+	else if (action == STARTED_EATING)
+		return "is eating";
+	else if (action == STARTED_SLEEPING)
+		return "is sleeping";
+	else if (action == STARTED_THINKING)
+		return "is thinking";
+	else if (action == DIED)
+		return "died";
+	return "";
 }
 
-void announce_death(t_philo *philo)
+void	announce(t_philo *philo, t_action action)
 {
 	unsigned long	time;
+	char			*message;
 
-	time = get_time();
-	printf("%lu %u died\n", time, philo->id);
+	mutex_lock(&philo->data->lock_simulation_ended);
+	mutex_lock(&philo->data->lock_simulation_start);
+	if (philo->data->simulation_ended)
+	{
+		// printf("\033[31mafter\n");
+		mutex_unlock(&philo->data->lock_simulation_ended);
+		mutex_unlock(&philo->data->lock_simulation_start);
+		return ;
+	}
+	if (action == DIED)
+		philo->data->simulation_ended = 1;
+	mutex_unlock(&philo->data->lock_simulation_ended);
+	time = get_time() - philo->data->simulation_start;
+	message = get_message_for_action(action);
+	printf("%lu %u %s\n", time, philo->id, message);
+	mutex_unlock(&philo->data->lock_simulation_start);
+}
+
+void	announce_activity(t_philo *philo)
+{
+	if (is_philo_eating(philo))
+		announce(philo, STARTED_EATING);
+	else if (is_philo_sleeping(philo))
+		announce(philo, STARTED_SLEEPING);
+	else if (is_philo_thinking(philo))
+		announce(philo, STARTED_THINKING);
 }
 
 void	terminate(t_philo *philo)
@@ -154,7 +179,7 @@ void	terminate(t_philo *philo)
 void	die(t_philo *philo)
 {
 	terminate(philo);
-	announce_death(philo);
+	announce(philo, DIED);
 }
 
 int	should_terminate(t_philo *philo)
@@ -245,11 +270,21 @@ int	are_forks_available(t_philo *philo)
 	return (is_fork_available(philo) && is_fork_available(philo->left_philo));
 }
 
+int	is_single_philo(t_data *data)
+{
+	int	is_single;
+
+	mutex_lock(&data->lock_num_philos);
+	is_single = data->num_philos == 1;
+	mutex_unlock(&data->lock_num_philos);
+	return (is_single);
+}
+
 int	can_philo_eat(t_philo *philo)
 {
 	int	picked_up_forks;
 
-	if (is_philo_eating(philo) || is_philo_sleeping(philo))
+	if (is_philo_eating(philo) || is_philo_sleeping(philo) || is_single_philo(philo->data))
 		return (0);
 	picked_up_forks = 0;
 	mutex_lock(&philo->fork.lock);

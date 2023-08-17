@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 16:58:53 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/12 16:13:26 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/17 12:49:44 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,5 +65,7 @@ void    mutex_unlock(t_mutex *mutex);
 // parse.c
 int     parse_num(char *str, unsigned int *result);
 
+void	announce(t_philo *philo, t_action action);
+void	pick_up_fork(t_philo *philo);
 
 #endif
