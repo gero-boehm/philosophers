@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 17:00:46 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/17 12:53:04 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/18 13:21:26 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,7 +109,7 @@ int	should_philo_die(t_philo *philo)
 	time = get_time_since_last_eaten(philo);
 	// printf(ORANGE "last eaten: %lu\n" RESET, time);
 	mutex_lock(&philo->data->lock_time_to_die);
-	should_die = time >= philo->data->time_to_die;
+	should_die = time >= philo->data->time_to_die + 7;
 	// printf(ORANGE "ttd: %u\n" RESET, philo->data->time_to_die);
 	// printf(ORANGE "should die: %d\n" RESET, time >= philo->data->time_to_die);
 	mutex_unlock(&philo->data->lock_time_to_die);
@@ -197,7 +197,6 @@ int	is_philo_satiated(t_philo *philo)
 	int	is_satiated;
 
 	mutex_lock(&philo->data->lock_num_eat);
-	// printf("%d\n", philo->num_eaten);
 	if (philo->data->num_eat == 0)
 		is_satiated = 0;
 	else
@@ -230,6 +229,8 @@ void	switch_activity(t_philo *philo, t_activity activity)
 	if (is_philo_eating(philo))
 		philo->last_eaten = time;
 	announce_activity(philo);
+	if (is_philo_thinking(philo))
+		usleep(4000);
 }
 
 int is_philo_done_eating(t_philo *philo)
@@ -241,7 +242,7 @@ int is_philo_done_eating(t_philo *philo)
 		return (0);
 	time = get_time_since_activity_start(philo);
 	mutex_lock(&philo->data->lock_time_to_eat);
-	is_done = time >= philo->data->time_to_eat;
+	is_done = time >= philo->data->time_to_eat - 1;
 	mutex_unlock(&philo->data->lock_time_to_eat);
 	return (is_done);
 }
@@ -255,7 +256,7 @@ int is_philo_done_sleeping(t_philo *philo)
 		return (0);
 	time = get_time_since_activity_start(philo);
 	mutex_lock(&philo->data->lock_time_to_sleep);
-	is_done = time >= philo->data->time_to_sleep;
+	is_done = time >= philo->data->time_to_sleep - 1;
 	mutex_unlock(&philo->data->lock_time_to_sleep);
 	return (is_done);
 }
