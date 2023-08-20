@@ -1,33 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   callback.c                                         :+:      :+:    :+:   */
+/*   fork_available.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/12 14:47:18 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/20 12:26:12 by gbohm            ###   ########.fr       */
+/*   Created: 2023/08/20 12:33:52 by gbohm             #+#    #+#             */
+/*   Updated: 2023/08/20 12:34:11 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-#include "philo.h"
+#include "philodef.h"
 
-void	*thread_callback(void *arg)
+static int	is_fork_available(t_philo *philo)
 {
-	t_philo			*philo;
+	return (!philo->fork.in_use);
+}
 
-	philo = arg;
-	usleep((philo->id % 2 == 0) * 1000);
-	usleep((philo->id % 3 == 0) * 4000);
-	while (1)
-	{
-		if (should_philo_die(philo))
-			die(philo);
-		if (should_terminate(philo))
-			return (NULL);
-		execute_activity(philo);
-		usleep(1000);
-	}
-	return (NULL);
+int	are_forks_available(t_philo *philo)
+{
+	return (is_fork_available(philo) && is_fork_available(philo->left_philo));
 }

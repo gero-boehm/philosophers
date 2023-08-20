@@ -1,33 +1,34 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   callback.c                                         :+:      :+:    :+:   */
+/*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/12 14:47:18 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/20 12:26:12 by gbohm            ###   ########.fr       */
+/*   Created: 2023/08/20 12:32:22 by gbohm             #+#    #+#             */
+/*   Updated: 2023/08/20 12:46:15 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
+#include <stdlib.h>
 #include "philo.h"
 
-void	*thread_callback(void *arg)
+void	wait_for_threads(t_data *data)
 {
-	t_philo			*philo;
+	unsigned int	i;
 
-	philo = arg;
-	usleep((philo->id % 2 == 0) * 1000);
-	usleep((philo->id % 3 == 0) * 4000);
-	while (1)
+	i = 0;
+	while (i < data->num_philos)
 	{
-		if (should_philo_die(philo))
-			die(philo);
-		if (should_terminate(philo))
-			return (NULL);
-		execute_activity(philo);
-		usleep(1000);
+		pthread_join(data->philos[i].thread, NULL);
+		i++;
 	}
-	return (NULL);
+}
+
+int	cleanup(t_data *data)
+{
+	wait_for_threads(data);
+	destroy_mutexes(data);
+	free(data->philos);
+	return (0);
 }

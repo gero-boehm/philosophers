@@ -1,33 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   callback.c                                         :+:      :+:    :+:   */
+/*   malloc2.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/08/12 14:47:18 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/20 12:26:12 by gbohm            ###   ########.fr       */
+/*   Created: 2023/08/20 12:34:37 by gbohm             #+#    #+#             */
+/*   Updated: 2023/08/20 12:34:45 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
-#include "philo.h"
+#include <stdlib.h>
 
-void	*thread_callback(void *arg)
+int	malloc2(size_t size, void **ptr)
 {
-	t_philo			*philo;
-
-	philo = arg;
-	usleep((philo->id % 2 == 0) * 1000);
-	usleep((philo->id % 3 == 0) * 4000);
-	while (1)
-	{
-		if (should_philo_die(philo))
-			die(philo);
-		if (should_terminate(philo))
-			return (NULL);
-		execute_activity(philo);
-		usleep(1000);
-	}
-	return (NULL);
+	*ptr = malloc(size);
+	return (*ptr == NULL);
 }

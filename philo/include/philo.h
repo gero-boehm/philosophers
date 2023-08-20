@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 16:58:53 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/18 13:20:42 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/20 12:42:52 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,42 +15,53 @@
 
 # include "philodef.h"
 
+// fork_available.c
+int     are_forks_available(t_philo *philo);
+
+// is_philo2.c
+int is_philo_done_eating(t_philo *philo);
+int is_philo_done_sleeping(t_philo *philo);
+
+// announce.c
+void    announce(t_philo *philo, t_action action);
+void    announce_activity(t_philo *philo);
+
 // fork.c
 void    pick_up_forks(t_philo *philo);
 void    put_down_forks(t_philo *philo);
 
-// philo.c
+// malloc2.c
 int     malloc2(size_t size, void **ptr);
-unsigned long   get_time(void);
-int     parse(char **argv, t_data *data);
-unsigned long   get_time_since_last_eaten(t_philo *philo);
-unsigned long   get_time_since_activity_start(t_philo *philo);
-int     is_philo_eating(t_philo *philo);
-int     is_philo_sleeping(t_philo *philo);
-int     is_philo_thinking(t_philo *philo);
-int     should_philo_die(t_philo *philo);
-void    announce_activity(t_philo *philo);
-void announce_death(t_philo *philo);
-void    terminate(t_philo *philo);
-void    die(t_philo *philo);
-int     should_terminate(t_philo *philo);
-int     is_philo_satiated(t_philo *philo);
-void    finish_eating(t_philo *philo);
+
+// activity.c
 void    switch_activity(t_philo *philo, t_activity activity);
-int is_philo_done_eating(t_philo *philo);
-int is_philo_done_sleeping(t_philo *philo);
-int     is_fork_available(t_philo *philo);
-int     are_forks_available(t_philo *philo);
-int     can_philo_eat(t_philo *philo);
-void execute_activity(t_philo *philo);
-void    wait_for_threads(t_data *data);
-int     cleanup(t_data *data);
+void	execute_activity(t_philo *philo);
 
 // callback.c
 void    *thread_callback(void *arg);
 
+// eat.c
+void    finish_eating(t_philo *philo);
+int     can_philo_eat(t_philo *philo);
+
 // setup.c
 int     setup(t_data *data);
+
+// time.c
+unsigned long   get_time(void);
+unsigned long   get_time_since_last_eaten(t_philo *philo);
+unsigned long   get_time_since_activity_start(t_philo *philo);
+
+// cleanup.c
+void    wait_for_threads(t_data *data);
+int     cleanup(t_data *data);
+
+// is_philo.c
+int     is_philo_eating(t_philo *philo);
+int     is_philo_sleeping(t_philo *philo);
+int     is_philo_thinking(t_philo *philo);
+int     is_philo_satiated(t_philo *philo);
+int     is_philo_single(t_data *data);
 
 // mutex/destroy.c
 void    destroy_mutexes(t_data *data);
@@ -63,8 +74,12 @@ void    mutex_lock(t_mutex *mutex);
 void    mutex_unlock(t_mutex *mutex);
 
 // parse.c
-int     parse_num(char *str, unsigned int *result);
+int     parse(char **argv, t_data *data);
 
-void	announce(t_philo *philo, t_action action);
+// terminate.c
+void    terminate(t_philo *philo);
+void    die(t_philo *philo);
+int     should_terminate(t_philo *philo);
+int     should_philo_die(t_philo *philo);
 
 #endif
