@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/12 14:40:01 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/12 17:25:21 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/20 15:09:33 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@
 
 static int	create_philo_array(t_data *data)
 {
-	return (malloc2(data->num_philos, (void **) &data->philos));
+	return (malloc2(data->num_philos * sizeof(t_philo),
+			(void **) &data->philos));
 }
 
 static t_philo	*get_left_philo(t_data *data, unsigned int index)

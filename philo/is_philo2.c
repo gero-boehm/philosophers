@@ -6,13 +6,13 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 12:35:01 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/20 12:36:48 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/20 14:17:40 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int is_philo_done_eating(t_philo *philo)
+int	is_philo_done_eating(t_philo *philo)
 {
 	unsigned long	time;
 	int				is_done;
@@ -26,7 +26,7 @@ int is_philo_done_eating(t_philo *philo)
 	return (is_done);
 }
 
-int is_philo_done_sleeping(t_philo *philo)
+int	is_philo_done_sleeping(t_philo *philo)
 {
 	unsigned long	time;
 	int				is_done;

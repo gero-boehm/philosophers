@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 12:30:33 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/20 12:31:00 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/20 14:18:07 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,16 @@
 static char	*get_message_for_action(t_action action)
 {
 	if (action == TOOK_FORK)
-		return "has taken a fork";
+		return ("has taken a fork");
 	else if (action == STARTED_EATING)
-		return "is eating";
+		return ("is eating");
 	else if (action == STARTED_SLEEPING)
-		return "is sleeping";
+		return ("is sleeping");
 	else if (action == STARTED_THINKING)
-		return "is thinking";
+		return ("is thinking");
 	else if (action == DIED)
-		return "died";
-	return "";
+		return ("died");
+	return ("");
 }
 
 void	announce(t_philo *philo, t_action action)

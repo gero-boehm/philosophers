@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 10:29:17 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/20 12:46:47 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/20 14:45:23 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,14 @@ static int	parse_num(char *str, unsigned int *result)
 	if (str_len(str) > 10)
 		return (1);
 	tmp = 0;
-	while(*str)
+	while (*str)
 	{
 		if (!is_digit(*str))
 			return (2);
 		tmp = tmp * 10 + *str - '0';
 		str++;
 	}
-	if(tmp > INT_MAX)
+	if (tmp > INT_MAX)
 		return (3);
 	*result = tmp;
 	return (0);
@@ -61,8 +61,13 @@ int	parse(char **argv, t_data *data)
 		return (4);
 	if (argv[5] == NULL)
 		data->num_eat = 0;
-	else if (parse_num(argv[5], &data->num_eat))
-		return (5);
+	else
+	{
+		if (parse_num(argv[5], &data->num_eat))
+			return (5);
+		if (data->num_eat == 0)
+			return (6);
+	}
 	data->num_philos_hungry = data->num_philos;
 	data->simulation_start = get_time();
 	data->simulation_ended = 0;

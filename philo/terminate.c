@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 12:31:32 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/20 12:37:18 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/20 14:14:30 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	terminate(t_philo *philo)
 	if (philo->data->should_terminate)
 	{
 		mutex_unlock(&philo->data->lock_should_terminate);
-		return;
+		return ;
 	}
 	philo->data->should_terminate = 1;
 	mutex_unlock(&philo->data->lock_should_terminate);

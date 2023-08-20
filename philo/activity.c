@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/20 12:38:37 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/20 12:44:46 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/20 14:18:28 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,10 @@ void	switch_activity(t_philo *philo, t_activity activity)
 
 void	execute_activity(t_philo *philo)
 {
-	if(is_philo_done_eating(philo))
+	if (is_philo_done_eating(philo))
 		switch_activity(philo, SLEEPING);
-	else if(is_philo_done_sleeping(philo))
+	else if (is_philo_done_sleeping(philo))
 		switch_activity(philo, THINKING);
-	if(can_philo_eat(philo))
+	if (can_philo_eat(philo))
 		switch_activity(philo, EATING);
 }

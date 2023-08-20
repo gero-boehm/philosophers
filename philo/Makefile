@@ -1,5 +1,5 @@
 CC=cc
-CFLAGS=-I include
+CFLAGS=-I include -pthread
 NAME=philo
 OBJ_DIR=obj
 SRC=mutex/destroy.c mutex/init.c mutex/lock.c activity.c announce.c callback.c cleanup.c eat.c fork_available.c fork.c is_philo.c is_philo2.c malloc2.c parse.c philo.c setup.c terminate.c time.c

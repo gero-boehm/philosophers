@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/08 16:58:53 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/17 12:47:44 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/20 14:54:57 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,8 @@
 
 # include <pthread.h>
 
-typedef struct s_data t_data;
-typedef struct s_philo t_philo;
+typedef struct s_data	t_data;
+typedef struct s_philo	t_philo;
 
 typedef enum e_activity {
 	EATING,
@@ -38,8 +38,7 @@ typedef struct s_mutex {
 	int				locked;
 }	t_mutex;
 
-typedef struct	s_fork
-{
+typedef struct s_fork {
 	int		in_use;
 	t_mutex	lock;
 }	t_fork;

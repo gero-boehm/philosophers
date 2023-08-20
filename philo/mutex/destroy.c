@@ -6,7 +6,7 @@
 /*   By: gbohm <gbohm@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/14 10:10:49 by gbohm             #+#    #+#             */
-/*   Updated: 2023/08/17 12:48:35 by gbohm            ###   ########.fr       */
+/*   Updated: 2023/08/20 14:18:37 by gbohm            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ static void	destroy_mutex(t_mutex *mutex)
 	pthread_mutex_destroy(&mutex->mutex);
 }
 
-static void destroy_philo_mutexes(t_data *data)
+static void	destroy_philo_mutexes(t_data *data)
 {
 	unsigned int	i;
 
